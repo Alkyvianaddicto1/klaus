@@ -2,14 +2,18 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Custom Password Generator</title>
+    <title>Secure Password Generator</title>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; text-align: center; padding: 50px; background-color: #f4f7f6; }
+        body { font-family: 'Segoe UI', sans-serif; text-align: center; padding: 50px; background-color: #f4f7f6; }
         .card { background: white; padding: 30px; border-radius: 10px; display: inline-block; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-        .result-box { background: #e8f4fd; padding: 15px; border-radius: 5px; margin-top: 20px; word-break: break-all; font-family: monospace; font-size: 1.2rem; }
-        select, input, button { padding: 10px; margin: 5px; border-radius: 5px; border: 1px solid #ccc; }
-        button { background-color: #27ae60; color: white; border: none; cursor: pointer; font-weight: bold; }
-        button:hover { background-color: #219150; }
+        .result-box { 
+            background: #e8f4fd; padding: 15px; border-radius: 5px; margin-top: 20px; 
+            font-family: monospace; font-size: 1.2rem; min-width: 250px; display: block;
+        }
+        select, input, button { padding: 10px; margin: 10px; border-radius: 5px; border: 1px solid #ccc; }
+        .gen-btn { background-color: #27ae60; color: white; border: none; cursor: pointer; font-weight: bold; }
+        .copy-btn { background-color: #34495e; color: white; border: none; cursor: pointer; margin-top: 10px; }
+        button:hover { opacity: 0.9; }
     </style>
 </head>
 <body>
@@ -18,14 +22,14 @@
     <h2>🔑 Password Generator</h2>
     <form method="POST">
         <div>
-            <label>Length:</label>
+            <label>Length: </label>
             <input type="number" name="length" value="16" min="4" max="100">
         </div>
         
         <div>
-            <label>Complexity:</label>
+            <label>Complexity: </label>
             <select name="mode">
-                <option value="all_mixed">All Mixed (Letters, Numbers, Symbols)</option>
+                <option value="all_mixed">All Mixed</option>
                 <option value="letters_only">Letters Only</option>
                 <option value="numbers_only">Numbers Only</option>
                 <option value="letters_symbols">Letters + Symbols</option>
@@ -33,16 +37,30 @@
             </select>
         </div>
 
-        <button type="submit">Generate Password</button>
+        <button type="submit" class="gen-btn">Generate Password</button>
     </form>
 
     {% if password %}
-        <div class="result-box">
-            {{ password }}
-        </div>
-        <p style="font-size: 0.8rem; color: #666;">Copy and save this securely!</p>
+        <div class="result-box" id="passwordText">{{ password }}</div>
+        <button class="copy-btn" onclick="copyPassword()">📋 Copy to Clipboard</button>
+        <p id="copyStatus" style="color: #27ae60; font-size: 0.8rem; height: 15px;"></p>
     {% endif %}
 </div>
+
+<script>
+function copyPassword() {
+    // Get the text from the result box
+    const password = document.getElementById("passwordText").innerText;
+    
+    // Use the modern Clipboard API
+    navigator.clipboard.writeText(password).then(() => {
+        const status = document.getElementById("copyStatus");
+        status.innerText = "Copied!";
+        // Reset message after 2 seconds
+        setTimeout(() => { status.innerText = ""; }, 2000);
+    });
+}
+</script>
 
 </body>
 </html>
