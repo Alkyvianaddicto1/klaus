@@ -44,6 +44,23 @@
         <button class="copy-btn" onclick="copyPassword()">📋 Copy to Clipboard</button>
         <p id="copyStatus" style="color: #27ae60; font-size: 0.8rem; height: 15px;"></p>
     {% endif %}
+
+    <hr style="margin-top: 20px; border: 0; border-top: 1px solid #eee;">
+
+    <div style="text-align: left; margin-top: 10px;">
+        <h4 style="margin-bottom: 5px;">Recent History</h4>
+        <ul style="list-style: none; padding: 0; font-family: monospace; font-size: 0.9rem;">
+            {% for p in history %}
+                <li style="background: #f9f9f9; padding: 5px; margin-bottom: 5px; border-radius: 3px; border-left: 3px solid #3498db;">
+                    {{ p }}
+                </li>
+            {% endfor %}
+        </ul>
+        {% if history %}
+            <a href="/clear" style="font-size: 0.7rem; color: #e74c3c; text-decoration: none;">Clear History</a>
+        {% endif %}
+    </div>
+    
 </div>
 
 <script>
