@@ -5,15 +5,15 @@
     <title>Secure Password Generator</title>
     <style>
         body { font-family: 'Segoe UI', sans-serif; text-align: center; padding: 50px; background-color: #f4f7f6; }
-        .card { background: white; padding: 30px; border-radius: 10px; display: inline-block; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-        .result-box { 
-            background: #e8f4fd; padding: 15px; border-radius: 5px; margin-top: 20px; 
-            font-family: monospace; font-size: 1.2rem; min-width: 250px; display: block;
-        }
-        select, input, button { padding: 10px; margin: 10px; border-radius: 5px; border: 1px solid #ccc; }
+        .card { background: white; padding: 30px; border-radius: 10px; display: inline-block; box-shadow: 0 4px 6px rgba(0,0,0,0.1); width: 350px; }
+        .result-box { background: #e8f4fd; padding: 15px; border-radius: 5px; margin-top: 20px; font-family: monospace; font-size: 1.2rem; word-break: break-all; border: 1px dashed #3498db; }
+        select, input, button { padding: 10px; margin: 10px; border-radius: 5px; border: 1px solid #ccc; width: 90%; }
         .gen-btn { background-color: #27ae60; color: white; border: none; cursor: pointer; font-weight: bold; }
         .copy-btn { background-color: #34495e; color: white; border: none; cursor: pointer; margin-top: 10px; }
-        button:hover { opacity: 0.9; }
+        
+        /* Strength Meter Styling */
+        meter { width: 95%; height: 25px; margin-top: 5px; }
+        .strength-text { font-size: 1rem; font-weight: bold; margin-top: 15px; }
     </style>
 </head>
 <body>
@@ -21,45 +21,65 @@
 <div class="card">
     <h2>🔑 Password Generator</h2>
     <form method="POST">
-        <div>
-            <label>Length: </label>
-            <input type="number" name="length" value="16" min="4" max="100">
-        </div>
+        <label>Length: <span id="lenLabel">16</span></label><br>
+        <input type="range" name="length" min="4" max="30" value="16" id="lenSlider" oninput="document.getElementById('lenLabel').innerText = this.value">
         
-        <div>
-            <label>Complexity: </label>
-            <select name="mode">
-                <option value="all_mixed">All Mixed</option>
-                <option value="letters_only">Letters Only</option>
-                <option value="numbers_only">Numbers Only</option>
-                <option value="letters_symbols">Letters + Symbols</option>
-                <option value="numbers_symbols">Numbers + Symbols</option>
-            </select>
-        </div>
+        <select name="mode">
+            <option value="all_mixed">All Mixed</option>
+            <option value="letters_only">Letters Only</option>
+            <option value="numbers_only">Numbers Only</option>
+            <option value="letters_symbols">Letters + Symbols</option>
+            <option value="numbers_symbols">Numbers + Symbols</option>
+        </select>
 
         <button type="submit" class="gen-btn">Generate Password</button>
     </form>
 
     {% if password %}
         <div class="result-box" id="passwordText">{{ password }}</div>
+        
+        <div class="strength-text">Strength: <span id="strengthStatus">...</span></div>
+        <meter id="strengthMeter" min="0" max="50" low="10" high="16" optimum="24" value="{{ password|length }}"></meter>
+
         <button class="copy-btn" onclick="copyPassword()">📋 Copy to Clipboard</button>
         <p id="copyStatus" style="color: #27ae60; font-size: 0.8rem; height: 15px;"></p>
     {% endif %}
 </div>
 
 <script>
-function copyPassword() {
-    // Get the text from the result box
+function checkStrength() {
     const password = document.getElementById("passwordText").innerText;
+    const meter = document.getElementById("strengthMeter");
+    const status = document.getElementById("strengthStatus");
     
-    // Use the modern Clipboard API
+    if (!password) return;
+
+    const len = password.length;
+    
+    // Logic for the text label
+    if (len < 10) {
+        status.innerText = "Weak";
+        status.style.color = "#e74c3c"; // Red
+    } else if (len < 16) {
+        status.innerText = "Good";
+        status.style.color = "#f39c12"; // Orange
+    } else {
+        status.innerText = "Strong";
+        status.style.color = "#27ae60"; // Green
+    }
+}
+
+function copyPassword() {
+    const password = document.getElementById("passwordText").innerText;
     navigator.clipboard.writeText(password).then(() => {
-        const status = document.getElementById("copyStatus");
-        status.innerText = "Copied!";
-        // Reset message after 2 seconds
-        setTimeout(() => { status.innerText = ""; }, 2000);
+        const copyBtn = document.getElementById("copyStatus");
+        copyBtn.innerText = "Copied!";
+        setTimeout(() => { copyBtn.innerText = ""; }, 2000);
     });
 }
+
+// Automatically run the strength check when the page loads with a new password
+window.onload = checkStrength;
 </script>
 
 </body>
